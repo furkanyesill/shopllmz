@@ -1,0 +1,122 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
+
+export default async function SuperAdminPage() {
+  
+  // Fetch Leads (Free Scanners)
+  const leads = await (prisma as any).lead.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
+
+  // Fetch Installed Sessions (Pro/App Accounts)
+  const sessions = await prisma.session.findMany();
+
+  // Deduplicate sessions by shop name
+  const uniqueProShops = Array.from(new Set(sessions.map((s: any) => s.shop)));
+
+  return (
+    <div className="min-h-screen bg-zinc-950 font-sans text-zinc-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-10 border-b border-zinc-800 pb-6 flex justify-between items-end">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">ShopLLMZ Hub (Super Admin)</h1>
+            <p className="text-zinc-400 text-sm">Satış, Lead Toplama ve Otomasyon CRM Paneli</p>
+          </div>
+          <div className="flex gap-4">
+            <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-sm font-medium">
+              Toplam Lead: {leads.length}
+            </div>
+            <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm font-medium">
+              Aktif Pro Kurulum: {uniqueProShops.length}
+            </div>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* LEADS SECTION (FREE SCANNERS) */}
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col h-[700px]">
+            <div className="p-6 border-b border-zinc-800 bg-zinc-900">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <span className="text-blue-400">👀</span> Potansiyel Müşteriler (Ücretsiz Tarama)
+              </h2>
+              <p className="text-xs text-zinc-500 mt-1">Ana sayfadan &quot;AEO Skor Testi&quot; yapan mağazalar. Bunları email ile Pro&apos;ya sat!</p>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 space-y-4 shadow-inner">
+              {leads.length === 0 ? (
+                <p className="text-zinc-500 text-center py-10">Henüz hiç tarama yapılmadı.</p>
+              ) : (
+                leads.map((lead: any) => (
+                  <div key={lead.id} className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl hover:border-blue-500/30 transition-colors">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-semibold text-zinc-200">{lead.shop}</h3>
+                        <p className="text-xs text-zinc-500">Tarama Sayısı: {lead.scans}</p>
+                      </div>
+                      <span className="text-xs text-zinc-500 bg-zinc-900 px-2 py-1 rounded">
+                        {new Date(lead.createdAt).toLocaleDateString('tr-TR')}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <a 
+                        href={`https://${lead.shop}`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        Mağazayı Ziyaret Et
+                      </a>
+                      <a 
+                        href={`mailto:hello@${lead.shop}`}
+                        className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        Mail At (Satış)
+                      </a>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* PRO INSTALLS SECTION */}
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col h-[700px]">
+            <div className="p-6 border-b border-zinc-800 bg-zinc-900">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <span className="text-emerald-400">💰</span> Aktif Kurulumlar (Pro)
+              </h2>
+              <p className="text-xs text-zinc-500 mt-1">Shopify App Store üzerinden uygulamanızı kurup yetki veren mağazalar.</p>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 space-y-4 shadow-inner">
+              {uniqueProShops.length === 0 ? (
+                <p className="text-zinc-500 text-center py-10">Henüz aktif bir kurulum yok.</p>
+              ) : (
+                uniqueProShops.map((shop: any, idx: number) => (
+                  <div key={idx} className="bg-zinc-950 border border-emerald-500/20 p-4 rounded-xl hover:border-emerald-500/50 transition-colors">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                          ✓
+                        </div>
+                        <h3 className="font-semibold text-emerald-100">{shop as string}</h3>
+                      </div>
+                      <a 
+                        href={`https://${shop as string}/admin/apps`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="text-xs bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        Shopify Admin Yönetimi
+                      </a>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

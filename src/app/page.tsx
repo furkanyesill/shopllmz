@@ -1,65 +1,120 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { cookies } from "next/headers";
+import { getDictionary, Locale } from "@/dictionaries";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const lang = (cookieStore.get("lang")?.value as Locale) || "en";
+  const t = getDictionary(lang);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="flex-1 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden min-h-screen">
+      {/* Background glow effects */}
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
+      
+      <div className="z-10 max-w-4xl mx-auto flex flex-col items-center gap-8 mt-[-10vh]">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium border border-blue-500/20">
+          <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+          {t.home.badge}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+        
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-tight">
+          {t.home.heroTitle} <br className="hidden md:block"/>
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-emerald-400">
+            {t.home.heroHighlight}
+          </span>
+        </h1>
+        
+        <p className="text-lg md:text-xl text-zinc-400 max-w-2xl">
+          {t.home.heroDesc}
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <Link href="/dashboard" className="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+            {t.common.freeTestBtn}
+          </Link>
+          <a href="#features" className="px-8 py-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-medium transition-all">
+            {t.common.howItWorks}
           </a>
         </div>
-      </main>
-    </div>
+      </div>
+      
+      {/* Features Grid */}
+      <div id="features" className="z-10 mt-32 max-w-6xl w-full grid grid-cols-1 md:grid-cols-3 gap-6 text-left px-6">
+        <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-blue-500/30 transition-colors">
+          <div className="h-12 w-12 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4 text-xl">
+            🤖
+          </div>
+          <h3 className="text-xl font-bold mb-2">{t.home.feat1Title}</h3>
+          <p className="text-zinc-400 text-sm">{t.home.feat1Desc}</p>
+        </div>
+        <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-emerald-500/30 transition-colors">
+          <div className="h-12 w-12 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 text-xl">
+            ⚡
+          </div>
+          <h3 className="text-xl font-bold mb-2">{t.home.feat2Title}</h3>
+          <p className="text-zinc-400 text-sm">{t.home.feat2Desc}</p>
+        </div>
+        <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-purple-500/30 transition-colors">
+          <div className="h-12 w-12 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4 text-xl">
+            🔎
+          </div>
+          <h3 className="text-xl font-bold mb-2">{t.home.feat3Title}</h3>
+          <p className="text-zinc-400 text-sm">{t.home.feat3Desc}</p>
+        </div>
+      </div>
+
+      {/* Pricing Section */}
+      <div id="pricing" className="z-10 mt-32 max-w-4xl mx-auto w-full px-6 text-left">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">{t.home.pricingTitle}</h2>
+          <p className="text-zinc-400">{t.home.pricingDesc}</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-8 rounded-3xl bg-zinc-900/50 border border-zinc-800">
+            <h3 className="text-2xl font-bold text-white mb-2">{t.home.feat3Title}</h3>
+            <div className="text-4xl font-bold text-white mb-6">{t.home.freeTier}</div>
+            <ul className="space-y-4 mb-8 text-zinc-400">
+              <li className="flex items-center gap-3">✓ {t.home.freeF1}</li>
+              <li className="flex items-center gap-3">✓ {t.home.freeF2}</li>
+              <li className="flex items-center gap-3">✓ {t.home.freeF3}</li>
+            </ul>
+            <Link href="/dashboard" className="block w-full text-center py-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors">
+              {t.common.freeTestBtn}
+            </Link>
+          </div>
+          <div className="p-8 rounded-3xl bg-blue-900/10 border border-blue-500/50 relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">{t.common.popular}</div>
+            <h3 className="text-2xl font-bold text-blue-400 mb-2">{t.home.proTier}</h3>
+            <div className="text-4xl font-bold text-white mb-6">{t.home.proPrice} <span className="text-lg text-zinc-500 font-normal">{t.home.proPer}</span></div>
+            <ul className="space-y-4 mb-8 text-zinc-300">
+              <li className="flex items-center gap-3">✓ {t.home.proF1}</li>
+              <li className="flex items-center gap-3">✓ {t.home.proF2}</li>
+              <li className="flex items-center gap-3">✓ {t.home.proF3}</li>
+              <li className="flex items-center gap-3">✓ {t.home.proF4}</li>
+            </ul>
+            {/* MANUAL STEP: Replace this href with real Paddle Checkout Link */}
+            <a href="#checkout-placeholder" className="block w-full text-center py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors shadow-lg shadow-blue-500/25">
+              {t.common.upgrade}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="z-10 mt-32 border-t border-zinc-800 w-full py-12 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-zinc-500 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-blue-500 font-bold text-lg">{t.common.appName}</span>
+            <span>© 2026. Tüm Hakları Saklıdır.</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="hover:text-zinc-300 transition-colors">{t.common.privacy}</Link>
+            <Link href="/terms" className="hover:text-zinc-300 transition-colors">{t.common.terms}</Link>
+            <a href="mailto:support@shopllmz.com" className="hover:text-zinc-300 transition-colors">{t.common.support} support@shopllmz.com</a>
+          </div>
+        </div>
+      </footer>
+    </main>
   );
 }
