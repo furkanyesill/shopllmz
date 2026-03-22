@@ -1,28 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import { shopify, sessionStorage } from '@/lib/shopify';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { shop: requestShop, url, jsonLd } = await req.json();
+    const { url, jsonLd } = await req.json();
     if (!url || !jsonLd) {
       return new NextResponse('Missing URL or JSON-LD data', { status: 400 });
     }
 
-    let domain = requestShop || url;
-    try { domain = new URL(domain).hostname; } catch(e){}
+    // 1. Get secure session directly from Cookies (No frontend parameter needed)
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('shopify_app_session')?.value;
 
-    const shop = shopify.utils.sanitizeShop(domain, true);
-    if (!shop) return new NextResponse('Invalid shop', { status: 400 });
+    if (!sessionId) {
+      return NextResponse.json({ success: false, error: 'Oturum bulunamadı. Lütfen sayfayı yenileyip baştan bağlanın.' }, { status: 401 });
+    }
 
-    // Load Offline Session
-    const sessionId = shopify.session.getOfflineId(shop);
+    // 2. Load the authenticated Shopify session
     const session = await sessionStorage.loadSession(sessionId);
+    if (!session || !session.shop) {
+      return NextResponse.json({ success: false, error: 'Shopify oturumunuz zaman aşımına uğradı.' }, { status: 401 });
+    }
 
-    if (!session) {
-      return NextResponse.json({ success: false, error: 'App not installed or session expired. Please Authenticate via /api/auth' }, { status: 401 });
+    const shop = session.shop;
+
+    // 3. Pro Subscription Gate (Check Lead model)
+    const lead = await (prisma as any).lead.findUnique({ where: { shop } });
+    const isPro = lead?.isPro || false;
+
+    if (!isPro) {
+      return NextResponse.json({ success: false, requirePro: true, error: "AEO Otomatik Enjeksiyonu sadece Pro planlara özeldir." });
     }
 
     const client = new shopify.clients.Rest({ session });

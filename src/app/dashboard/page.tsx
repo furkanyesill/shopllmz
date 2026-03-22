@@ -211,20 +211,19 @@ export default function DashboardPage() {
                   onClick={async () => {
                     alert("Shopify Theme API'sine JSON-LD enjeksiyonu başlatılıyor...");
                     try {
-                      const searchParams = new URLSearchParams(window.location.search);
-                      const activeShop = (window as any).shopify?.config?.shop || searchParams.get("shop");
-
-                      if (!activeShop) {
-                        alert("Hata: Mağaza bağlantısı doğrulanamadı. Lütfen sayfayı yenileyin.");
-                        return;
-                      }
-
                       const res = await fetch("/api/heal", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ shop: activeShop, url, jsonLd: results.jsonLd })
+                        body: JSON.stringify({ url, jsonLd: results.jsonLd })
                       });
                       const data = await res.json();
+                      
+                      if (data.requirePro) {
+                        alert(data.error);
+                        window.location.href = "/pro";
+                        return;
+                      }
+
                       if(data.success) {
                         alert("Başarılı! " + data.message);
                       } else {
