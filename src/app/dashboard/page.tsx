@@ -212,7 +212,12 @@ export default function DashboardPage() {
                     alert("Shopify Theme API'sine JSON-LD enjeksiyonu başlatılıyor...");
                     try {
                       const searchParams = new URLSearchParams(window.location.search);
-                      const activeShop = searchParams.get("shop");
+                      const activeShop = (window as any).shopify?.config?.shop || searchParams.get("shop");
+
+                      if (!activeShop) {
+                        alert("Hata: Mağaza bağlantısı doğrulanamadı. Lütfen sayfayı yenileyin.");
+                        return;
+                      }
 
                       const res = await fetch("/api/heal", {
                         method: "POST",
