@@ -72,11 +72,26 @@ export async function POST(req: Request) {
 
       const publicData = await publicResponse.json();
 
+      // Fetch the store's real currency from the public shop.json endpoint
+      let shopCurrency = 'USD'; // fallback only
+      try {
+        const shopRes = await fetch(`https://${domain}/shop.json`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (shopRes.ok) {
+          const shopData = await shopRes.json();
+          shopCurrency = shopData?.shop?.currency || 'USD';
+        }
+      } catch {
+        // shop.json may be disabled on some stores; use fallback silently
+      }
+
       if (publicData.products && publicData.products.length > 0) {
         rawProducts = publicData.products;
         scannedProducts = rawProducts.map((p: any) => p.title);
 
-        // Send richer data to Gemini: image, price, currency, variants
+        // Send richer data to Gemini: real currency from shop.json, image, price, variants
         rawProductData = JSON.stringify(rawProducts.map((p: any) => {
           const firstVariant = p.variants?.[0];
           const firstImage = p.images?.[0]?.src;
@@ -88,6 +103,7 @@ export async function POST(req: Request) {
             body: p.body_html?.replace(/<[^>]*>?/gm, '').substring(0, 400),
             image: firstImage || null,
             price: firstVariant?.price || null,
+            currency: shopCurrency, // ✅ Real currency from shop.json
             sku: firstVariant?.sku || null,
             available: firstVariant?.available ?? true,
             variants_count: p.variants?.length || 1,
@@ -98,6 +114,7 @@ export async function POST(req: Request) {
       }
     } catch (fetchErr: any) {
       console.error('Public Fetch Error:', fetchErr.message);
+
       return NextResponse.json(
         { error: `Mağazanın public ürün verisine ulaşılamıyor. (${fetchErr.message})` },
         { status: 400 }
