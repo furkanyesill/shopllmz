@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sessionStorage } from '@/lib/shopify';
+import { sessionStorage, shopify } from '@/lib/shopify';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,27 +34,23 @@ export async function GET(req: Request) {
     const tokenData = await accessTokenResponse.json() as { access_token: string };
     const { access_token } = tokenData;
 
-    // Build a session compatible with @shopify/shopify-api PrismaSessionStorage
-    const sessionId = `offline_${shop}`;
-    const session = {
-      id: sessionId,
-      shop,
-      state: url.searchParams.get('state') || '',
-      isOnline: false,
-      accessToken: access_token,
-      scope: process.env.SHOPIFY_SCOPES || 'read_products,write_themes,read_themes',
-    };
+    // Build a proper Shopify SDK Session object (required by PrismaSessionStorage)
+    const sessionId = shopify.session.getOfflineId(shop);
+    const session = shopify.session.customAppSession(shop);
+    session.accessToken = access_token;
+    session.scope = process.env.SHOPIFY_SCOPES || 'read_products,write_themes,read_themes';
+    session.state = url.searchParams.get('state') || '';
 
-    // Persist session to database
-    await sessionStorage.storeSession(session as Parameters<typeof sessionStorage.storeSession>[0]);
+    // Persist session to Neon Postgres via Prisma
+    await sessionStorage.storeSession(session);
 
-    console.log(`OAuth Success — Shop: ${shop}`);
+    console.log(`✅ OAuth Success — Shop: ${shop}, Session ID: ${sessionId}`);
 
-    // Redirect to the Shopify Admin embedded app page
+    // Redirect into Shopify Admin embedded app
     const redirectUrl = `https://${shop}/admin/apps/shopllmz`;
     const response = NextResponse.redirect(redirectUrl);
 
-    response.cookies.set('shopify_app_session', sessionId, {
+    response.cookies.set('shopify_app_session', session.id, {
       httpOnly: true,
       sameSite: 'none',
       secure: true,
