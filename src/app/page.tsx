@@ -106,12 +106,12 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-zinc-500 text-sm">
           <div className="flex items-center gap-2">
             <span className="text-blue-500 font-bold text-lg">{t.common.appName}</span>
-            <span>© 2026. Tüm Hakları Saklıdır.</span>
+            <span>© 2026. All Rights Reserved.</span>
           </div>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-zinc-300 transition-colors">{t.common.privacy}</Link>
             <Link href="/terms" className="hover:text-zinc-300 transition-colors">{t.common.terms}</Link>
-            <a href="mailto:support@shopllmz.com" className="hover:text-zinc-300 transition-colors">{t.common.support} support@shopllmz.com</a>
+            <a href="mailto:softwareyesil@gmail.com" className="hover:text-zinc-300 transition-colors">{t.common.support} softwareyesil@gmail.com</a>
           </div>
         </div>
       </footer>
