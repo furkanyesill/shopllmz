@@ -3,8 +3,8 @@ import { sessionStorage } from '@/lib/shopify';
 
 export const dynamic = 'force-dynamic';
 
-const PLAN_PRICE = '9.99';
-const PLAN_NAME = 'ShopLLMZ Pro';
+const PLAN_PRICE = '49.00';
+const PLAN_NAME = 'ShopLLMZ Pro — $49/month';
 const HOST_NAME = process.env.HOST_NAME || 'https://shopllmz.com';
 
 export async function POST(req: Request) {
