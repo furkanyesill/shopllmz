@@ -23,8 +23,8 @@ export default async function RootLayout({
   return (
     <html lang={lang} className="dark">
       <head>
-        {/* MANUAL STEP: Add PostHog or Google Analytics Script here */}
-        {/* Example: <script src="..." data-domain="shopllmz.com"></script> */}
+        {/* Shopify App Bridge — enables embedded Shopify Admin experience */}
+        <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js" crossOrigin="anonymous" async />
       </head>
       <body className={`${inter.className} bg-zinc-950 text-zinc-50 antialiased min-h-screen flex flex-col relative`}>
         <LanguageSwitcher />
