@@ -1,5 +1,5 @@
 name = "ShopLLMZ"
-client_id = "SHOPIFY_API_KEY_PLACEHOLDER"
+client_id = "98ecd3968dbbddd9b0a80eae8c630dee"
 application_url = "https://shopllmz.com"
 embedded = true
 
