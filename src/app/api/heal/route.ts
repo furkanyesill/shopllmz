@@ -6,13 +6,13 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { url, jsonLd } = await req.json();
+    const { shop: requestShop, url, jsonLd } = await req.json();
     if (!url || !jsonLd) {
       return new NextResponse('Missing URL or JSON-LD data', { status: 400 });
     }
 
-    let domain = url;
-    try { domain = new URL(url).hostname; } catch(e){}
+    let domain = requestShop || url;
+    try { domain = new URL(domain).hostname; } catch(e){}
 
     const shop = shopify.utils.sanitizeShop(domain, true);
     if (!shop) return new NextResponse('Invalid shop', { status: 400 });
