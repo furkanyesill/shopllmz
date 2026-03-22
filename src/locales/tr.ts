@@ -53,5 +53,16 @@ export const tr = {
     jsonldDesc: "Bu şemayı `theme.liquid` dosyanızda `<head>` etiketleri arasına yapıştırın.",
     autoFixBtn: "Shopify API ile Otomatik Düzelt",
     autoFixDisabled: "Bu özellik Ücretsiz planda devre dışıdır. Otomatik düzeltme için lütfen Pro'ya geçin veya kodları manuel uygulayın."
+  },
+  proPage: {
+    title: "ShopLLMZ Pro'ya Geçin",
+    subtitle: "AEO Şampiyonu olmak için tüm özellikleri açın.",
+    price: "$49",
+    perMonth: "/ay",
+    feature1: "Sınırsız Yapay Zeka Taraması",
+    feature2: "Otomatik JSON-LD Enjeksiyonu",
+    feature3: "llms.txt Mağaza Uyumluluğu",
+    feature4: "7 Gün Ücretsiz Deneme",
+    btnText: "Planı Başlat (Shopify ile)"
   }
 };

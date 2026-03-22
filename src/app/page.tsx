@@ -94,9 +94,9 @@ export default async function Home() {
               <li className="flex items-center gap-3">✓ {t.home.proF4}</li>
             </ul>
             {/* MANUAL STEP: Replace this href with real Paddle Checkout Link */}
-            <a href="#checkout-placeholder" className="block w-full text-center py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors shadow-lg shadow-blue-500/25">
+            <Link href="/pro" className="block w-full text-center py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors shadow-lg shadow-blue-500/25">
               {t.common.upgrade}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

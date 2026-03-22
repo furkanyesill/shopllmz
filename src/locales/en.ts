@@ -53,5 +53,16 @@ export const en = {
     jsonldDesc: "Add this schema inside `<head>` or before `</body>` in your `theme.liquid` file.",
     autoFixBtn: "Fix Automatically via Shopify API",
     autoFixDisabled: "This feature is disabled in the Free plan. Please upgrade to Pro or apply manually."
+  },
+  proPage: {
+    title: "Upgrade to ShopLLMZ Pro",
+    subtitle: "Unlock all features to become an AEO Champion.",
+    price: "$49",
+    perMonth: "/month",
+    feature1: "Unlimited AI Scans",
+    feature2: "Automatic JSON-LD Injection",
+    feature3: "llms.txt Store Compliance",
+    feature4: "7-Day Free Trial",
+    btnText: "Start Plan (via Shopify)"
   }
 };
