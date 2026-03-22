@@ -1,0 +1,84 @@
+{% comment %}
+  ShopLLMZ JSON-LD App Block
+  This block is injected into Shopify product pages via Theme App Extensions.
+  It places AI-optimized JSON-LD structured data in the <head> so that
+  AI engines (ChatGPT, Gemini, Perplexity) can recommend this product.
+  When the app is uninstalled, this block is automatically removed — no theme pollution.
+{% endcomment %}
+
+{% if product %}
+  {% assign product_url = shop.url | append: product.url %}
+  {% assign product_image = product.featured_image | img_url: 'master' %}
+  {% assign first_variant = product.selected_or_first_available_variant %}
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "description": {{ product.description | strip_html | truncatewords: 40 | json }},
+    {% if product_image != blank %}
+    "image": {
+      "@type": "ImageObject",
+      "url": {{ product_image | json }}
+    },
+    {% endif %}
+    "brand": {
+      "@type": "Brand",
+      "name": {{ product.vendor | json }}
+    },
+    "sku": {{ first_variant.sku | default: product.id | json }},
+    {% if product.type != blank %}
+    "material": {{ product.type | json }},
+    {% endif %}
+    "offers": {
+      "@type": "Offer",
+      "url": {{ product_url | json }},
+      "priceCurrency": {{ shop.currency | json }},
+      "price": {{ first_variant.price | money_without_currency | remove: ',' | json }},
+      "availability": {% if first_variant.available %}"https://schema.org/InStock"{% else %}"https://schema.org/OutOfStock"{% endif %},
+      "seller": {
+        "@type": "Organization",
+        "name": {{ shop.name | json }}
+      },
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "0",
+          "currency": {{ shop.currency | json }}
+        }
+      }
+    },
+    "additionalProperty": [
+      {% for tag in product.tags limit: 5 %}
+      {
+        "@type": "PropertyValue",
+        "name": "Tag",
+        "value": {{ tag | json }}
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    "hasDefinedTerm": [
+      {% for tag in product.tags limit: 8 %}
+      { "@type": "DefinedTerm", "name": {{ tag | json }} }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+    {% if product.metafields.reviews.rating != blank %}
+    ,"aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": {{ product.metafields.reviews.rating.value.rating | json }},
+      "reviewCount": {{ product.metafields.reviews.rating_count.value | json }}
+    }
+    {% endif %}
+  }
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "ShopLLMZ JSON-LD",
+  "target": "head",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,39 @@
+name = "ShopLLMZ"
+client_id = "SHOPIFY_API_KEY_PLACEHOLDER"
+application_url = "https://shopllmz.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = ""
+
+[access_scopes]
+scopes = "read_products,write_themes,read_themes"
+
+[auth]
+redirect_urls = [
+  "https://shopllmz.com/api/auth/callback",
+  "https://shopllmz.com/api/auth"
+]
+
+[webhooks]
+api_version = "2024-10"
+
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled"]
+  uri = "/api/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = ["customers/data_request"]
+  uri = "/api/webhooks/customers/data_request"
+
+  [[webhooks.subscriptions]]
+  topics = ["customers/redact"]
+  uri = "/api/webhooks/customers/redact"
+
+  [[webhooks.subscriptions]]
+  topics = ["shop/redact"]
+  uri = "/api/webhooks/shop/redact"
+
+[pos]
+embedded = false
