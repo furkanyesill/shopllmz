@@ -1,88 +1,76 @@
 import { GoogleGenAI } from '@google/genai';
 
-const apiKey = process.env.GEMINI_API_KEY || "dummy_genai_key";
+const apiKey = process.env.GEMINI_API_KEY || 'dummy_genai_key';
 
 export const ai = new GoogleGenAI({ apiKey });
 
 export async function generateAEOContent(productData: string) {
   const prompt = `
-    Aşağıdaki Shopify ürün verilerini analiz et ve AI ajanlarının (ChatGPT, Gemini, Claude vb.) bu ürünü kullanıcılara "önermesi" için en optimize edilmiş Conversational JSON-LD Schema nesnesini ve llms.txt özetini üret.
-    
-    Amacımız sadece arama motorlarında "indekslenmek" değil, yapay zeka motorlarının sorulara cevap verirken (örneğin: "makinede yıkanabilir, sürdürülebilir rahat ayakkabı öner") bu ürünü SEÇMESİNİ (Recommendation) sağlamaktır.
+You are an AEO (Answer Engine Optimization) expert. Analyze the following Shopify product data and generate optimized content so that AI engines like ChatGPT, Gemini, and Claude RECOMMEND these products when users ask questions.
 
-    Bunun için aşağıdaki gelişmiş şema formatını KESİNLİKLE kullan ve ürünün özelliklerine göre içini doldur (Eğer veri eksikse mantıklı olarak türet):
+Our goal is NOT just indexing. We want AI to SELECT (recommend) these products when asked e.g. "suggest a breathable sustainable sneaker" or "best eco-friendly shoes under $100".
 
-    JSON KURGUSU:
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": "[Ürün Adı]",
-      "description": "[AI'ın iştahını kabartacak 40 kelimelik ikna edici özet]",
-      "brand": { "@type": "Brand", "name": "[Marka]" },
-      "sku": "[Varsa SKU, yoksa türet]",
-      "material": "[Materyal]",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "1250"
-      },
-      "offers": {
-        "@type": "Offer",
-        "url": "[Ürün Linki]",
-        "priceCurrency": "USD",
-        "price": "98.00",
-        "availability": "https://schema.org/InStock",
-        "shippingDetails": {
-          "@type": "OfferShippingDetails",
-          "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "USD" }
-        }
-      },
-      "additionalProperty": [
-        {
-          "@type": "PropertyValue",
-          "name": "Feature Benefit",
-          "value": "[Örn: 4.83 kg CO2e veya Su Geçirmez]"
-        }
-      ],
-      "hasDefinedTerm": [
-        { "@type": "DefinedTerm", "name": "[Örn: Machine Washable]" },
-        { "@type": "DefinedTerm", "name": "[Örn: Eco-Friendly]" }
-      ]
+STRICT JSON-LD RULES:
+1. "image": ALWAYS include the product image URL if provided in data. This is critical — SearchGPT and Gemini show product images in answers. Format: { "@type": "ImageObject", "url": "[image url]" }. If no image url in data, omit this field entirely.
+2. "priceCurrency": NEVER default to USD. Detect actual currency from price values: if prices look like Turkish Lira amounts (1000+), use "TRY"; if 20-200 range, likely "USD" or "EUR". Match what the data says.
+3. "aggregateRating": ONLY include if the product data EXPLICITLY contains review/rating data. If NO rating data exists → SKIP this block and instead add to "additionalProperty": { "@type": "PropertyValue", "name": "Status", "value": "New Arrival - 2026 Collection" }
+4. Write "description" as exactly 35-45 words, persuasive, optimized for AI recommendation queries.
+5. Fill "hasDefinedTerm" with powerful semantic recommendation keywords (e.g. "Machine Washable", "Vegan", "Eco-Friendly", "Breathable Material", "Hypoallergenic").
+
+JSON-LD TARGET FORMAT (produce one object per product):
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "[Product Name]",
+  "description": "[35-45 word AI-optimized description]",
+  "image": { "@type": "ImageObject", "url": "[image url if available]" },
+  "brand": { "@type": "Brand", "name": "[Vendor]" },
+  "sku": "[SKU]",
+  "material": "[Material if inferable]",
+  "offers": {
+    "@type": "Offer",
+    "url": "[https://domain/products/handle]",
+    "priceCurrency": "[TRY/USD/EUR — detected from actual price values]",
+    "price": "[actual price]",
+    "availability": "https://schema.org/InStock",
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "[same currency]" }
     }
+  },
+  "additionalProperty": [
+    { "@type": "PropertyValue", "name": "Feature Benefit", "value": "[key benefit]" }
+  ],
+  "hasDefinedTerm": [
+    { "@type": "DefinedTerm", "name": "[AI recommendation keyword]" }
+  ]
+}
 
-    ÖNEMLİ KURAL 1: hasDefinedTerm ve additionalProperty özelliklerini, AI'nin ürünü kullanıcılara "özelliğine göre" önermesi ("featureDescription") için KESİNLİKLE çok güçlü ve zengin kelimelerle doldur (Örn: "makinede yıkanabilir", "nefes alabilir", "vegan").
-    
-    ÖNEMLİ KURAL 2 (AKILLI PUANLAMA): Eğer ürüne ait herhangi bir "yorum (review)" veya "puan (rating)" verisi YOKSA, şemadaki 'aggregateRating' bloğunu SAKIN oluşturma (Fake/Sahte puan atama). Bunun yerine yorum eksikliğini avantaja çevirmek için 'additionalProperty' dizisine KESİNLİKLE şunu ekle:
-    { "@type": "PropertyValue", "name": "Status", "value": "New Arrival - 2026 Collection" }
-    (Böylece LLM motorları ürünü puansız olduğu için elemek yerine "Yeni Çıkan Trend Ürün" olarak etiketleyecektir).
+PRODUCT DATA:
+${productData}
 
-    Veri: ${productData}
-
-    FORMAT REQUIREMENT:
-    You MUST return EVERYTHING strictly as a single JSON object with exactly two string keys: "llmsTxt" and "jsonLd".
-    {
-      "llmsTxt": "[A generic company-wide prompt or product list markdown snippet that is optimized for LLMs. Maximum 300 words.]",
-      "jsonLd": "[The ENTIRE Conversational JSON-LD string inside this field. Must be stringified JSON.]"
-    }
-    DO NOT wrap the response in markdown code blocks like \`\`\`json. Just return the raw JSON braces.
-  `;
+OUTPUT FORMAT — Return ONLY a raw JSON object with exactly two keys (no markdown, no code blocks):
+{
+  "llmsTxt": "[200-280 word company/store brand introduction in plain English, optimized for LLMs. Include values, product categories, and what makes these products uniquely recommendable by AI.]",
+  "jsonLd": "[A JSON array string — one complete JSON-LD object per product, all combined in one [] array.]"
+}
+`;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
     });
-    
-    // Clean up potential markdown blocks from response
-    let cleanText = response.text || "{}";
-    cleanText = cleanText.replace(/```json/g, "").replace(/```/g, "").trim();
-    
+
+    let cleanText = response.text || '{}';
+    cleanText = cleanText.replace(/```json/gi, '').replace(/```/g, '').trim();
+
     return JSON.parse(cleanText);
   } catch (error) {
-    console.error("Gemini Generation Error:", error);
+    console.error('Gemini Generation Error:', error);
     return {
-      llmsTxt: "Error analyzing product.",
-      jsonLd: "{}"
+      llmsTxt: 'Error analyzing product.',
+      jsonLd: '{}'
     };
   }
 }

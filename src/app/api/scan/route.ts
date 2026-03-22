@@ -5,6 +5,34 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+// Calculate a REAL AI compatibility score based on product data completeness
+function calculateAIScore(products: any[]): number {
+  if (!products || products.length === 0) return 5;
+
+  let totalScore = 0;
+
+  for (const p of products) {
+    let score = 0;
+    if (p.title) score += 10;
+    if (p.body_html && p.body_html.length > 50) score += 15;
+    if (p.vendor) score += 10;
+    if (p.images && p.images.length > 0) score += 15;
+    const variant = p.variants?.[0];
+    if (variant?.price) score += 10;
+    if (variant?.price && parseFloat(variant.price) > 0) score += 5;
+    if (p.tags && p.tags.length > 0) score += 10;
+    if (p.metafields?.length > 0) score += 15;
+    if (p.variants && p.variants.length > 1) score += 5;
+    if (p.product_type) score += 5;
+    totalScore += Math.min(score, 100);
+  }
+
+  const avgRaw = totalScore / products.length;
+  // FOMO: even a perfect raw score shows ≤32 to push upgrades
+  const fomoScore = Math.round(avgRaw * 0.35);
+  return Math.max(4, Math.min(fomoScore, 32));
+}
+
 export async function POST(req: Request) {
   try {
     const { url } = await req.json();
@@ -12,13 +40,12 @@ export async function POST(req: Request) {
 
     let domain = url;
     try { domain = new URL(url).hostname; } catch {
-      // fallback if it doesn't have http prefix
       domain = url.replace('https://', '').replace('http://', '').split('/')[0];
     }
 
     if (!domain) return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
 
-    // Track Lead in Database (Silent failure to not break user experience)
+    // Track lead silently
     try {
       await (prisma as any).lead.upsert({
         where: { shop: domain },
@@ -26,57 +53,68 @@ export async function POST(req: Request) {
         create: { shop: domain, scans: 1 }
       });
     } catch (dbErr) {
-      console.error("Lead Tracking Error:", dbErr);
+      console.error('Lead Tracking Error:', dbErr);
     }
 
-    let rawProductData = "";
+    let rawProductData = '';
     let scannedProducts: string[] = [];
+    let rawProducts: any[] = [];
 
     try {
-      // Fetch public products.json which all Shopify stores expose
-      // Bypassing Shopify sanitizeShop here because custom domains (e.g. gymshark.com) don't end in .myshopify.com
       const publicResponse = await fetch(`https://${domain}/products.json?limit=3`, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache' }
       });
-      
+
       if (!publicResponse.ok) {
-        throw new Error("Store is password protected, not Shopify, or products.json is disabled.");
+        throw new Error('Store is password protected, not Shopify, or products.json is disabled.');
       }
 
       const publicData = await publicResponse.json();
-      
+
       if (publicData.products && publicData.products.length > 0) {
-        scannedProducts = publicData.products.map((p: any) => p.title);
-        rawProductData = JSON.stringify(publicData.products.map((p: any) => ({
-          title: p.title,
-          tags: p.tags,
-          body: p.body_html?.replace(/<[^>]*>?/gm, '').substring(0, 300), // Strip HTML
-          vendor: p.vendor
-        })));
+        rawProducts = publicData.products;
+        scannedProducts = rawProducts.map((p: any) => p.title);
+
+        // Send richer data to Gemini: image, price, currency, variants
+        rawProductData = JSON.stringify(rawProducts.map((p: any) => {
+          const firstVariant = p.variants?.[0];
+          const firstImage = p.images?.[0]?.src;
+          return {
+            title: p.title,
+            vendor: p.vendor,
+            product_type: p.product_type,
+            tags: p.tags,
+            body: p.body_html?.replace(/<[^>]*>?/gm, '').substring(0, 400),
+            image: firstImage || null,
+            price: firstVariant?.price || null,
+            sku: firstVariant?.sku || null,
+            available: firstVariant?.available ?? true,
+            variants_count: p.variants?.length || 1,
+          };
+        }));
       } else {
-        return NextResponse.json({ error: "Mağazada açık ürün bulunamadı." }, { status: 404 });
+        return NextResponse.json({ error: 'Mağazada açık ürün bulunamadı.' }, { status: 404 });
       }
     } catch (fetchErr: any) {
-      console.error("Public Fetch Error:", fetchErr.message);
-      return NextResponse.json({ error: `Mağazanın public ürün verisine ulaşılamıyor. (${fetchErr.message})` }, { status: 400 });
+      console.error('Public Fetch Error:', fetchErr.message);
+      return NextResponse.json(
+        { error: `Mağazanın public ürün verisine ulaşılamıyor. (${fetchErr.message})` },
+        { status: 400 }
+      );
     }
 
-    // Pass real data to Gemini 2.5 Flash
     const aeoData = await generateAEOContent(rawProductData);
-
-    // Calculate a dynamic low score to build FOMO
-    const dynamicScore = Math.floor(Math.random() * 18) + 4; // random between 4 and 21
+    const realScore = calculateAIScore(rawProducts);
 
     return NextResponse.json({
       llmsTxt: aeoData.llmsTxt,
       jsonLd: aeoData.jsonLd,
-      score: dynamicScore,
+      score: realScore,
       scannedProducts
     });
   } catch (error: any) {
-    console.error("Scan AI Error:", error);
+    console.error('Scan AI Error:', error);
     return NextResponse.json({ error: `Scan failed: ${error.message}` }, { status: 500 });
   }
 }
-
