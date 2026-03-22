@@ -53,9 +53,14 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 max-w-6xl mx-auto w-full p-6 pt-24 font-sans text-zinc-100">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-white">{t.dashboard.title}</h1>
-        <p className="text-zinc-400">Shopify mağazanızı yapay zeka ajanlarına hazırlayın.</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 text-white">{t.dashboard.title}</h1>
+          <p className="text-zinc-400">Shopify mağazanızı yapay zeka ajanlarına hazırlayın.</p>
+        </div>
+        <a href="/pro" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
+          Pro&apos;ya Geç 🚀
+        </a>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
