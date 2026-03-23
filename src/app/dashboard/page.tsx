@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import ClientPage from "./ClientPage";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +8,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: an
   // Await searchParams to support both Next.js 14 and 15 safely
   const params = await Promise.resolve(searchParams);
   const shop = params?.shop || null;
+  
+  if (!shop) {
+    redirect("/login");
+  }
   
   let isPro = false;
   

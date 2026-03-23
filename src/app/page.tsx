@@ -9,6 +9,14 @@ export default async function Home() {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden min-h-screen">
+      {/* Top Nav */}
+      <div className="absolute top-6 right-6 z-50">
+        <Link href="/login" className="px-5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800 text-zinc-300 text-sm font-medium rounded-xl transition-all shadow-lg flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Mağaza Girişi (Login)
+        </Link>
+      </div>
+
       {/* Background glow effects */}
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
       

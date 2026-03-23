@@ -1,9 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { loginSuperadmin } from './actions';
 
 export const dynamic = 'force-dynamic';
 
-export default async function SuperAdminPage() {
+export default async function SuperAdminPage(props: { searchParams: Promise<{ error?: string }> }) {
+  const searchParams = await props.searchParams;
+  const cookieStore = await cookies();
+  const isAuth = cookieStore.get('superadmin_auth')?.value === 'true';
+
+  if (!isAuth) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 font-sans">
+        <div className="w-full max-w-sm bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-white mb-2">Superadmin</h1>
+            <p className="text-zinc-500 text-sm">Giriş yapmak için şifre gereklidir.</p>
+          </div>
+          {searchParams.error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-lg mb-6 text-center">
+              Hatalı şifre.
+            </div>
+          )}
+          <form action={loginSuperadmin} className="space-y-4">
+            <div>
+              <input 
+                type="password" 
+                name="password" 
+                placeholder="Şifreyi girin" 
+                className="w-full bg-zinc-950 border border-zinc-800 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+                required
+              />
+            </div>
+            <button type="submit" className="w-full bg-white hover:bg-zinc-200 text-black font-bold py-3 rounded-xl transition-colors">
+              Giriş Yap
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
   
   // Fetch Leads (Free Scanners)
   const leads = await (prisma as any).lead.findMany({
