@@ -63,8 +63,14 @@ OUTPUT FORMAT — Return ONLY a raw JSON object with exactly two keys (no markdo
     });
 
     let cleanText = response.text || '{}';
+    
+    // Robust extraction: strip markdown and extract the core JSON object
     cleanText = cleanText.replace(/```json/gi, '').replace(/```/g, '').trim();
-
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleanText = jsonMatch[0];
+    }
+    
     return JSON.parse(cleanText);
   } catch (error) {
     console.error('Gemini Generation Error:', error);

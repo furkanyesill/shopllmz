@@ -1,19 +1,26 @@
 /* eslint-disable */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { getDictionary, Locale } from "@/dictionaries";
 
-export default function DashboardPage() {
+function DashboardContent() {
+  const searchParams = useSearchParams();
+  const shopParam = searchParams.get("shop");
+  
+  const [activeShop, setActiveShop] = useState<string | null>(null);
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState<"idle" | "scanning" | "done">("idle");
   const [results, setResults] = useState<{ llmsTxt: string; jsonLd: string; score: number; scannedProducts?: string[] } | null>(null);
   
   const [lang, setLang] = useState<Locale>("en");
-  
   const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
+    // Preserve shop parameter on initial mount before App Bridge completely wipes the history
+    if (shopParam) setActiveShop(shopParam);
+
     // Read from cookie for language
     const cookies = document.cookie.split("; ");
     const langCookie = cookies.find((row) => row.startsWith("lang="));
@@ -30,7 +37,7 @@ export default function DashboardPage() {
         if (data.isPro) setIsPro(true);
       })
       .catch(() => {});
-  }, []);
+  }, [shopParam]);
 
   const t = getDictionary(lang);
 
@@ -170,7 +177,7 @@ export default function DashboardPage() {
                   
                   {results.scannedProducts && results.scannedProducts.length > 0 && (
                     <div className="bg-emerald-950/40 border border-emerald-500/20 p-3 rounded-lg">
-                      <p className="text-xs text-emerald-200/80 mb-2 font-semibold uppercase tracking-wider">🎯 Örnek Olarak Taranan 3 Ürününüz:</p>
+                      <p className="text-xs text-emerald-200/80 mb-2 font-semibold uppercase tracking-wider">🎯 Örnek Olarak Taranan Ürünler:</p>
                       <ul className="text-sm text-emerald-300/90 list-disc list-inside space-y-1">
                         {results.scannedProducts.map((title, i) => (
                           <li key={i}>{title}</li>
@@ -229,20 +236,17 @@ export default function DashboardPage() {
                 </p>
                 <button 
                   onClick={async () => {
+                    const finalShop = activeShop || (window as any).shopify?.config?.shop;
+                    if (!finalShop) {
+                       alert("Hata: Mağaza bağlantısı doğrulanamadı. Lütfen sayfayı yenileyin.");
+                       return;
+                    }
                     alert("Shopify Theme API'sine JSON-LD enjeksiyonu başlatılıyor...");
                     try {
-                      const searchParams = new URLSearchParams(window.location.search);
-                      const activeShop = (window as any).shopify?.config?.shop || searchParams.get("shop");
-
-                      if (!activeShop) {
-                        alert("Hata: Mağaza bağlantısı doğrulanamadı. Lütfen sayfayı yenileyin.");
-                        return;
-                      }
-
                       const res = await fetch("/api/heal", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ shop: activeShop, url, jsonLd: results.jsonLd })
+                        body: JSON.stringify({ shop: finalShop, url, jsonLd: results.jsonLd })
                       });
                       const data = await res.json();
                       
@@ -272,5 +276,13 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen text-center flex items-center justify-center text-white">Yükleniyor...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
