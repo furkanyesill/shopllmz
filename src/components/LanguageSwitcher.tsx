@@ -3,8 +3,11 @@
 
 import { useEffect, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 export default function LanguageSwitcher() {
   const [lang, setLang] = useState("en");
+  const router = useRouter();
 
   useEffect(() => {
     // Read from cookie
@@ -13,16 +16,15 @@ export default function LanguageSwitcher() {
     if (langCookie) {
       setTimeout(() => setLang(langCookie.split("=")[1]), 0);
     } else {
-      // Basic browser detection on first load (fallback)
-      if (navigator.language.startsWith("tr")) {
-        setLang("tr");
-      }
+      // Default to EN, option for TR
+      setLang("en");
     }
   }, []);
 
   const changeLang = (newLang: "en" | "tr") => {
     document.cookie = `lang=${newLang}; path=/; max-age=31536000`; // 1 year
-    window.location.reload();
+    setLang(newLang);
+    router.refresh(); // Soft refresh state
   };
 
   return (

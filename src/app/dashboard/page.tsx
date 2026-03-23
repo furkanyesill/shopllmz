@@ -11,16 +11,25 @@ export default function DashboardPage() {
   
   const [lang, setLang] = useState<Locale>("en");
   
+  const [isPro, setIsPro] = useState(false);
+
   useEffect(() => {
+    // Read from cookie for language
     const cookies = document.cookie.split("; ");
     const langCookie = cookies.find((row) => row.startsWith("lang="));
     if (langCookie) {
       setTimeout(() => setLang(langCookie.split("=")[1] as Locale), 0);
     } else {
-      if (navigator.language.startsWith("tr")) {
-        setLang("tr");
-      }
+      setLang("en"); // Default English
     }
+
+    // Check Pro Status
+    fetch("/api/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.isPro) setIsPro(true);
+      })
+      .catch(() => {});
   }, []);
 
   const t = getDictionary(lang);
@@ -58,9 +67,20 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold mb-2 text-white">{t.dashboard.title}</h1>
           <p className="text-zinc-400">Shopify mağazanızı yapay zeka ajanlarına hazırlayın.</p>
         </div>
-        <a href="/pro" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
-          Pro&apos;ya Geç 🚀
-        </a>
+        
+        {isPro ? (
+          <div className="bg-emerald-500/10 text-emerald-400 font-medium py-2 px-6 rounded-lg flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-500/10">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            Pro Aktif
+          </div>
+        ) : (
+          <a href="/pro" className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
+            Pro&apos;ya Geç 🚀
+          </a>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
