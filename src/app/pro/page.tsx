@@ -1,10 +1,53 @@
-import { cookies } from "next/headers";
-import { getDictionary, Locale } from "@/dictionaries";
+"use client";
 
-export default async function ProPage() {
-  const cookieStore = await cookies();
-  const lang = (cookieStore.get("lang")?.value as Locale) || "en";
+import { useSearchParams } from "next/navigation";
+import { getDictionary, Locale } from "@/dictionaries";
+import { useEffect, useState, Suspense } from "react";
+
+function ProPageContent() {
+  const searchParams = useSearchParams();
+  const shop = searchParams.get("shop");
+  const [lang, setLang] = useState<Locale>("en");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const cookies = document.cookie.split("; ");
+    const langCookie = cookies.find((row) => row.startsWith("lang="));
+    if (langCookie) {
+      setLang(langCookie.split("=")[1] as Locale);
+    }
+  }, []);
+
   const t = getDictionary(lang);
+
+  const handleCheckout = async () => {
+    if (!shop) {
+      alert("Hata: Mağaza bilgisi bulunamadı.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/billing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shop }),
+      });
+      const data = await res.json();
+      
+      if (data.confirmationUrl) {
+        // App Bridge v4 iframe bypass explicitly targeting the top window
+        window.open(data.confirmationUrl, "_top");
+      } else {
+        alert(data.error || "Ödeme bağlantısı oluşturulamadı.");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Bağlantı hatası oluştu.");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -31,17 +74,24 @@ export default async function ProPage() {
           </div>
 
           <div>
-            <form action="/api/billing" method="GET">
-              <button
-                type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-md"
-              >
-                {t.proPage.btnText}
-              </button>
-            </form>
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-md"
+            >
+              {loading ? "Yönlendiriliyor..." : t.proPage.btnText}
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+export default function ProPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen items-center justify-center flex">Yükleniyor...</div>}>
+      <ProPageContent />
+    </Suspense>
+  )
 }

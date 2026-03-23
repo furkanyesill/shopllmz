@@ -75,7 +75,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
             Pro Aktif
           </div>
         ) : (
-          <a href="/pro" className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
+          <a href={`/pro?shop=${activeShop || ""}`} className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
             Pro&apos;ya Geç 🚀
           </a>
         )}

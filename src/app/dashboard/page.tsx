@@ -12,10 +12,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: an
   
   if (shop) {
     try {
-      // Ensure the merchant has a Lead record, auto-granting Pro for testing
+      // Ensure the merchant has a Lead record. For App Review, default to false.
       const lead = await (prisma as any).lead.upsert({
         where: { shop },
-        create: { shop, isPro: true, scans: 0 },
+        create: { shop, isPro: false, scans: 0 },
         update: {} // Do not overwrite if exists
       });
       if (lead?.isPro) {

@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         price: PLAN_PRICE,
         return_url: `${HOST_NAME}/api/billing/confirm?shop=${shop}`,
         trial_days: 7,
-        test: process.env.NODE_ENV !== 'production', // test mode in dev
+        test: process.env.SHOPIFY_BILLING_TEST_MODE !== 'false', // Default to true for App Review Dev Stores
       },
     };
 
