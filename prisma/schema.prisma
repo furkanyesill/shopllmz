@@ -34,7 +34,7 @@ model Lead {
   scans     Int      @default(1)
   isPro     Boolean  @default(false)
   chargeId  String?
+  aiSchema  String?  // NEW: Stores the AI JSON-LD schema for zero-footprint Theme Block injection
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
