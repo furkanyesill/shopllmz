@@ -1,33 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
-import { shopify, sessionStorage } from '@/lib/shopify';
-import { cookies } from 'next/headers';
+import { shopify } from '@/lib/shopify';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { url, jsonLd } = await req.json();
-    if (!url || !jsonLd) {
-      return new NextResponse('Missing URL or JSON-LD data', { status: 400 });
+    const { shop: requestShop, url, jsonLd } = await req.json();
+    if (!url || !jsonLd || !requestShop) {
+      return new NextResponse('Missing URL, Shop or JSON-LD data', { status: 400 });
     }
 
-    // 1. Get secure session directly from Cookies (No frontend parameter needed)
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get('shopify_app_session')?.value;
+    const shop = shopify.utils.sanitizeShop(requestShop, true);
+    if (!shop) return new NextResponse('Invalid shop', { status: 400 });
 
-    if (!sessionId) {
-      return NextResponse.json({ success: false, error: 'Oturum bulunamadı. Lütfen sayfayı yenileyip baştan bağlanın.' }, { status: 401 });
+    // Look up the most recent session directly from the DB
+    const dbSession = await (prisma as any).session.findFirst({
+      where: { shop },
+    });
+
+    if (!dbSession) {
+      return NextResponse.json({ success: false, error: 'Mağaza oturumu bulunamadı. Uygulamayı yeniden yükleyin.' }, { status: 401 });
     }
 
-    // 2. Load the authenticated Shopify session
-    const session = await sessionStorage.loadSession(sessionId);
-    if (!session || !session.shop) {
-      return NextResponse.json({ success: false, error: 'Shopify oturumunuz zaman aşımına uğradı.' }, { status: 401 });
-    }
-
-    const shop = session.shop;
+    // Reconstruct the Session object
+    const session = shopify.session.customAppSession(shop);
+    session.accessToken = dbSession.accessToken;
+    session.scope = dbSession.scope;
 
     // 3. Pro Subscription Gate (Check Lead model)
     const lead = await (prisma as any).lead.findUnique({ where: { shop } });
