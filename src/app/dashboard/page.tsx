@@ -11,9 +11,18 @@ export default async function DashboardPage({ searchParams }: { searchParams: an
   let isPro = false;
   
   if (shop) {
-    const lead = await (prisma as any).lead.findUnique({ where: { shop } });
-    if (lead?.isPro) {
-      isPro = true;
+    try {
+      // Ensure the merchant has a Lead record, auto-granting Pro for testing
+      const lead = await (prisma as any).lead.upsert({
+        where: { shop },
+        create: { shop, isPro: true, scans: 0 },
+        update: {} // Do not overwrite if exists
+      });
+      if (lead?.isPro) {
+        isPro = true;
+      }
+    } catch (e) {
+      console.error("Dashboard DB Init Error:", e);
     }
   }
 
