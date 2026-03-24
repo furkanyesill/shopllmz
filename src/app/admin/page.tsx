@@ -33,7 +33,7 @@ export default function ProDashboardPage() {
             </span>
           </div>
           <div className="flex gap-4 items-center text-sm font-medium text-zinc-400">
-            <Link href="/" className="hover:text-white transition-colors">Ana Sayfa (Çıkış)</Link>
+            <Link href="/" className="hover:text-white transition-colors">Home (Exit)</Link>
           </div>
         </div>
       </header>
@@ -41,8 +41,8 @@ export default function ProDashboardPage() {
       <main className="max-w-5xl mx-auto px-6 py-12 flex-1 w-full">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white mb-2 tracking-tight">AI & SEO Optimizasyonu</h1>
-          <p className="text-zinc-400 text-sm">Yapay Zeka (ChatGPT, Gemini) ve Arama Motorları için mağaza şemalarınız.</p>
+          <h1 className="text-2xl font-bold text-white mb-2 tracking-tight">AI & SEO Optimization</h1>
+          <p className="text-zinc-400 text-sm">Store schemas for Artificial Intelligence (ChatGPT, Gemini) and Search Engines.</p>
         </div>
 
         {!hasSynced ? (
@@ -51,9 +51,9 @@ export default function ProDashboardPage() {
             <div className="w-20 h-20 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
               📦
             </div>
-            <h2 className="text-xl font-bold text-white mb-3">Henüz Ürün Optimize Etmediniz</h2>
+            <h2 className="text-xl font-bold text-white mb-3">You Haven't Optimized Any Products Yet</h2>
             <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
-              Theme App Extension (App Block) altyapımız hazır. Başlamak için mağazanızdaki ürünleri yapay zeka ile senkronize edin. Sistem otomatik olarak JSON-LD verilerini tema bloklarınıza (kaynak kodunu bozmadan) enjekte edecektir. 
+              Our Theme App Extension (App Block) infrastructure is ready. To get started, sync your store's products with AI. The system will automatically inject JSON-LD data into your theme blocks (without breaking the source code). 
             </p>
             <button 
               onClick={handleSync}
@@ -63,10 +63,10 @@ export default function ProDashboardPage() {
               {isSyncing ? (
                 <span className="flex items-center gap-2">
                   <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                  Senkronize Ediliyor...
+                  Syncing...
                 </span>
               ) : (
-                "Kataloğu Optimize Etmeye Başla"
+                "Start Optimizing Catalog"
               )}
             </button>
           </div>
@@ -77,18 +77,18 @@ export default function ProDashboardPage() {
             <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl flex items-start gap-4">
                <span className="text-xl mt-0.5">ℹ️</span>
                <div>
-                 <h4 className="text-blue-400 font-semibold mb-1">Theme App Blocks Aktif</h4>
-                 <p className="text-sm text-blue-200/70">JSON-LD şemalarınız Shopify &quot;Theme App Extension&quot; standartlarıyla mağazanıza aktarıldı. Tema dosyalarınız temiz tutulmaktadır.</p>
+                 <h4 className="text-blue-400 font-semibold mb-1">Theme App Blocks Active</h4>
+                 <p className="text-sm text-blue-200/70">Your JSON-LD schemas have been injected into your store via Shopify &quot;Theme App Extension&quot; standards. Your theme files are kept clean.</p>
                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-                <h3 className="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">Optimize Edilen Ürün</h3>
+                <h3 className="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">Optimized Products</h3>
                 <span className="text-3xl font-bold text-white">1,248</span>
               </div>
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-                <h3 className="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">AI Görünürlük Skoru</h3>
+                <h3 className="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">AI Visibility Score</h3>
                 <span className="text-3xl font-bold text-emerald-400">99 / 100</span>
               </div>
               <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
@@ -100,7 +100,7 @@ export default function ProDashboardPage() {
             </div>
 
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8">
-              <h2 className="text-lg font-bold text-white mb-6">Canlı Entegrasyon Önizlemesi</h2>
+              <h2 className="text-lg font-bold text-white mb-6">Live Integration Preview</h2>
               <div className="w-full bg-[#1e1e1e] rounded-lg border border-zinc-800 overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-2 bg-black text-xs text-emerald-400 border-b border-zinc-800 font-mono">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -127,8 +127,8 @@ export default function ProDashboardPage() {
       <footer className="border-t border-zinc-900 mt-auto py-8">
         <div className="max-w-5xl mx-auto px-6 flex flex-col items-center justify-center gap-4 text-sm text-zinc-500">
           <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-zinc-300 underline underline-offset-4">Gizlilik Politikası (Privacy Policy)</Link>
-            <a href="mailto:support@glowaeo.com" className="hover:text-zinc-300 underline underline-offset-4">Bize Ulaşın (Support)</a>
+            <Link href="/privacy" className="hover:text-zinc-300 underline underline-offset-4">Privacy Policy</Link>
+            <a href="mailto:support@glowaeo.com" className="hover:text-zinc-300 underline underline-offset-4">Contact Support</a>
           </div>
           <p>© 2026 GlowAEO. Not affiliated with Shopify Inc.</p>
         </div>
