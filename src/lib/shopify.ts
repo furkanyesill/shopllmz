@@ -16,7 +16,7 @@ export const shopify = shopifyApi({
   scopes,
   hostName: hostName.replace(/^https?:\/\//, ''),
   hostScheme: 'https',
-  apiVersion: (ApiVersion as any).January25 || '2025-01',
+  apiVersion: (ApiVersion as any).January26 || '2026-01',
   isEmbeddedApp: true,
 });
 
