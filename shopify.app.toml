@@ -23,17 +23,10 @@ api_version = "2026-01"
   topics = ["app/uninstalled"]
   uri = "/api/webhooks/app/uninstalled"
 
-  [[webhooks.subscriptions]]
-  topics = ["customers/data_request"]
-  uri = "/api/webhooks/customers/data_request"
 
-  [[webhooks.subscriptions]]
-  topics = ["customers/redact"]
-  uri = "/api/webhooks/customers/redact"
-
-  [[webhooks.subscriptions]]
-  topics = ["shop/redact"]
-  uri = "/api/webhooks/shop/redact"
-
+  [webhooks.privacy_compliance]
+  customer_deletion_url = "https://shopllmz.com/api/webhooks/customers/redact"
+  customer_data_request_url = "https://shopllmz.com/api/webhooks/customers/data_request"
+  shop_deletion_url = "https://shopllmz.com/api/webhooks/shop/redact"
 [pos]
 embedded = false
