@@ -239,7 +239,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                   onClick={async () => {
                     const finalShop = activeShop || (window as any).shopify?.config?.shop;
                     if (!finalShop) {
-                       alert("Error: Store connection could not be verified. Please refresh the page.");
+                       window.location.href = "/login";
                        return;
                     }
                     alert("Initiating JSON-LD injection into Shopify Theme API...");
@@ -252,8 +252,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                       const data = await res.json();
                       
                       if (data.requirePro) {
-                        alert(data.error);
-                        window.location.href = "/pro";
+                        window.location.href = "/pro?shop=" + finalShop;
                         return;
                       }
 
