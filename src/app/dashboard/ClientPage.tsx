@@ -71,16 +71,21 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
              🎧 Support
           </a>
           {isPro ? (
-            <div className="bg-emerald-500/10 text-emerald-400 font-medium py-2 px-6 rounded-lg flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-500/10">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-              </span>
-              Pro Active
+            <div className="flex items-center gap-3">
+              <a href="/superadmin" target="_blank" className="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 font-medium py-2 px-4 rounded-lg flex items-center gap-2 border border-indigo-500/30 transition-all text-sm whitespace-nowrap">
+                👑 Admin Panel
+              </a>
+              <div className="bg-emerald-500/10 text-emerald-400 font-medium py-2 px-6 rounded-lg flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-500/10 whitespace-nowrap">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                Pro Active
+              </div>
             </div>
           ) : (
-            <a href={`/pro?shop=${activeShop || ""}`} className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
-              Pro&apos;ya Geç 🚀
+            <a href={`/pro?shop=${activeShop || ""}`} className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105 whitespace-nowrap">
+              Upgrade to Pro 🚀
             </a>
           )}
         </div>
