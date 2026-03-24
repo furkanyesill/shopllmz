@@ -13,7 +13,7 @@ export default async function Home() {
       <div className="absolute top-6 right-6 z-50">
         <Link href="/login" className="px-5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800 text-zinc-300 text-sm font-medium rounded-xl transition-all shadow-lg flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Mağaza Girişi (Login)
+          Store Login
         </Link>
       </div>
 
