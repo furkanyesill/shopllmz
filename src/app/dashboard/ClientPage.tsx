@@ -59,14 +59,14 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
   };
 
   return (
-    <div className="flex-1 max-w-6xl mx-auto w-full p-6 pt-24 font-sans text-zinc-100">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold mb-2 text-white">{t.dashboard.title}</h1>
-          <p className="text-zinc-400">Shopify mağazanızı yapay zeka ajanlarına hazırlayın.</p>
+    <div className="flex-1 max-w-6xl mx-auto w-full p-4 sm:p-6 pt-20 sm:pt-24 font-sans text-zinc-100">
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="w-full">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">{t.dashboard.title}</h1>
+          <p className="text-sm sm:text-base text-zinc-400">Shopify mağazanızı yapay zeka ajanlarına hazırlayın.</p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <a href="mailto:softwareyesil@gmail.com" className="bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors border border-zinc-700/50 shadow-sm">
              🎧 Destek
           </a>
@@ -142,8 +142,8 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
 
           {status === "done" && results && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-red-500/10 border border-red-500/50 text-red-50 p-5 rounded-2xl flex items-start gap-4 shadow-[0_0_30px_rgba(239,68,68,0.15)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-10 -mt-10" />
+              <div className="bg-red-500/10 border border-red-500/50 text-red-50 p-4 sm:p-5 rounded-2xl flex items-start gap-4 shadow-[0_0_30px_rgba(239,68,68,0.15)] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-red-500/10 rounded-full blur-2xl sm:blur-3xl -mr-10 -mt-10" />
                 <span className="text-4xl mt-1 animate-pulse">⚠️</span>
                 <div className="relative z-10 w-full">
                   <h3 className="font-bold text-red-400 text-xl mb-2 tracking-tight">Kritik Risk: Mağazanız Yapay Zeka İçin Görünmez!</h3>

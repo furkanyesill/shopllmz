@@ -18,9 +18,9 @@ export default async function Home() {
       </div>
 
       {/* Background glow effects */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[300px] sm:h-[400px] bg-blue-600/15 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none" />
       
-      <div className="z-10 max-w-4xl mx-auto flex flex-col items-center gap-8 mt-[-10vh]">
+      <div className="z-10 max-w-4xl mx-auto flex flex-col items-center gap-6 sm:gap-8 mt-12 sm:mt-[-10vh] px-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium border border-blue-500/20">
           <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
           {t.home.badge}
@@ -37,11 +37,11 @@ export default async function Home() {
           {t.home.heroDesc}
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-6">
-          <Link href="/dashboard" className="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+        <div className="flex flex-col sm:flex-row gap-4 mt-6 w-full sm:w-auto">
+          <Link href="/dashboard" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] text-center">
             {t.common.freeTestBtn}
           </Link>
-          <a href="#features" className="px-8 py-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-medium transition-all">
+          <a href="#features" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-medium transition-all text-center">
             {t.common.howItWorks}
           </a>
         </div>
