@@ -67,7 +67,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
         </div>
         
         <div className="flex items-center gap-3">
-          <a href="mailto:support@shopllmz.com" className="bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors border border-zinc-700/50 shadow-sm">
+          <a href="mailto:softwareyesil@gmail.com" className="bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors border border-zinc-700/50 shadow-sm">
              🎧 Destek
           </a>
           {isPro ? (
