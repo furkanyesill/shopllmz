@@ -8,7 +8,7 @@ export default async function Home() {
   const t = getDictionary(lang);
 
   return (
-    <main className="flex-1 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden min-h-screen">
+    <main className="flex-1 flex flex-col items-center pt-8 p-6 text-center relative min-h-screen overflow-x-hidden">
       {/* Top Nav */}
       <div className="absolute top-6 right-6 z-50">
         <Link href="/login" className="px-5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-blue-500/50 hover:bg-zinc-800 text-zinc-300 text-sm font-medium rounded-xl transition-all shadow-lg flex items-center gap-2">
@@ -20,7 +20,7 @@ export default async function Home() {
       {/* Background glow effects */}
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[300px] sm:h-[400px] bg-blue-600/15 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none" />
       
-      <div className="z-10 max-w-4xl mx-auto flex flex-col items-center gap-6 sm:gap-8 mt-12 sm:mt-[-10vh] px-4">
+      <div className="z-10 max-w-4xl mx-auto flex flex-col items-center gap-6 sm:gap-8 pt-24 sm:pt-40 pb-16 px-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium border border-blue-500/20">
           <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
           {t.home.badge}
