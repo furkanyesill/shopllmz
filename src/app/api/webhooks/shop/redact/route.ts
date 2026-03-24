@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { verifyShopifyWebhook } from '@/lib/verifyWebhook';
 
-export async function POST() {
-  // GDPR Webhook: Shopify expects a 200 OK to acknowledge receipt.
-  // Automatically called 48 hours after application uninstall. 
-  // All our actual cleanup is done inside the app/uninstall webhook, so we just acknowledge it here.
+export async function POST(req: Request) {
+  const rawBody = await verifyShopifyWebhook(req);
+  if (!rawBody) {
+    return new NextResponse('Unauthorized: HMAC verification failed.', { status: 401 });
+  }
+  // GDPR: Automatically called 48h after app uninstall.
+  // Our cleanup happens in the app/uninstalled webhook.
   return new NextResponse('OK', { status: 200 });
 }
