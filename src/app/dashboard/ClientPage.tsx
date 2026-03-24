@@ -47,13 +47,13 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error || "Bilinmeyen bir hata oluştu.");
+        throw new Error(data.error || "An unknown error occurred.");
       }
 
       setResults(data);
       setStatus("done");
     } catch (err: any) {
-      alert("Hata: " + err.message);
+      alert("Error: " + err.message);
       setStatus("idle");
     }
   };
@@ -63,12 +63,12 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="w-full">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">{t.dashboard.title}</h1>
-          <p className="text-sm sm:text-base text-zinc-400">Shopify mağazanızı yapay zeka ajanlarına hazırlayın.</p>
+          <p className="text-sm sm:text-base text-zinc-400">Prepare your Shopify store for Artificial Intelligence agents.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <a href="mailto:softwareyesil@gmail.com" className="bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors border border-zinc-700/50 shadow-sm">
-             🎧 Destek
+             🎧 Support
           </a>
           {isPro ? (
             <div className="bg-emerald-500/10 text-emerald-400 font-medium py-2 px-6 rounded-lg flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-500/10">
@@ -76,7 +76,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
               </span>
-              Pro Aktif
+              Pro Active
             </div>
           ) : (
             <a href={`/pro?shop=${activeShop || ""}`} className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105">
@@ -89,7 +89,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
           <div className="p-6 rounded-2xl bg-zinc-900/80 border border-zinc-800 backdrop-blur-sm shadow-xl">
-            <h2 className="text-xl font-semibold mb-4 text-white">Yeni Mağaza Tarama</h2>
+            <h2 className="text-xl font-semibold mb-4 text-white">New Store Scan</h2>
             <form onSubmit={handleScan} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">{t.dashboard.urlLabel}</label>
@@ -125,7 +125,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
         <div className="lg:col-span-2 space-y-6">
           {status === "idle" && (
             <div className="h-full min-h-[400px] flex items-center justify-center border border-dashed border-zinc-800 rounded-2xl bg-zinc-900/30 p-12 text-center text-zinc-500 transition-all">
-              <p>Sonuçları görmek için bir mağaza URL'si girip analiz başlatın.</p>
+              <p>Enter a store URL and start an analysis to see the results.</p>
             </div>
           )}
 
@@ -135,7 +135,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                 <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                   <div className="h-4 w-4 rounded-full bg-blue-400 animate-ping"></div>
                 </div>
-                <p>AI Ajanları simüle ediliyor... Yüzlerce sayfa analiz ediliyor...</p>
+                <p>Simulating AI Agents... Analyzing hundreds of pages...</p>
               </div>
             </div>
           )}
@@ -146,12 +146,12 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                 <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-red-500/10 rounded-full blur-2xl sm:blur-3xl -mr-10 -mt-10" />
                 <span className="text-4xl mt-1 animate-pulse">⚠️</span>
                 <div className="relative z-10 w-full">
-                  <h3 className="font-bold text-red-400 text-xl mb-2 tracking-tight">Kritik Risk: Mağazanız Yapay Zeka İçin Görünmez!</h3>
+                  <h3 className="font-bold text-red-400 text-xl mb-2 tracking-tight">Critical Risk: Your Store is Invisible to AI!</h3>
                   <p className="text-sm text-red-100/80 mb-4 leading-relaxed">
-                    Sistemimiz mağazanızı taradı. Ne yazık ki ChatGPT, Perplexity ve Apple Intelligence gibi motorlar mağazanızı <strong>anlamıyor</strong> ve <strong>tavsiye etmiyor.</strong> Müşterileriniz yapay zekaya "hangi ürünü almalıyım?" diye sorduğunda rakipleriniz listeleniyor.
+                    Our system scanned your store. Unfortunately, engines like ChatGPT, Perplexity, and Apple Intelligence do not understand and will not recommend your store. When customers ask AI "which product should I buy?", your competitors are listed instead.
                   </p>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-red-950/40 p-3 rounded-xl border border-red-500/20">
-                    <span className="text-sm font-medium text-red-200">Mevcut AI Uyumluluk Skorunuz:</span>
+                    <span className="text-sm font-medium text-red-200">Current AI Compatibility Score:</span>
                     <div className="flex items-center gap-3 mt-2 sm:mt-0">
                       <div className="w-32 h-2 bg-red-950 rounded-full overflow-hidden">
                         <div 
@@ -168,12 +168,12 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
               <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl flex items-start gap-3 mt-6">
                 <span className="text-2xl mt-1">✨</span>
                 <div className="w-full">
-                  <h3 className="font-bold text-emerald-300">İyi Haber: Çözümünüz Hazır!</h3>
-                  <p className="text-sm opacity-90 text-emerald-100/70 mb-3">Aşağıdaki AI kodlarını (JSON-LD) Shopify sayfanıza ekleyerek saniyeler içinde ChatGPT'nin ilk önerisi olabilirsiniz.</p>
+                  <h3 className="font-bold text-emerald-300">Good News: Your Solution is Ready!</h3>
+                  <p className="text-sm opacity-90 text-emerald-100/70 mb-3">By adding the AI code (JSON-LD) below to your Shopify store, you can become ChatGPT's top recommendation in seconds.</p>
                   
                   {results.scannedProducts && results.scannedProducts.length > 0 && (
                     <div className="bg-emerald-950/40 border border-emerald-500/20 p-3 rounded-lg">
-                      <p className="text-xs text-emerald-200/80 mb-2 font-semibold uppercase tracking-wider">🎯 Örnek Olarak Taranan Ürünler:</p>
+                      <p className="text-xs text-emerald-200/80 mb-2 font-semibold uppercase tracking-wider">🎯 Example Scanned Products:</p>
                       <ul className="text-sm text-emerald-300/90 list-disc list-inside space-y-1">
                         {results.scannedProducts.map((title, i) => (
                           <li key={i}>{title}</li>
@@ -228,16 +228,16 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                   🚀 Autopilot (Self-Healing)
                 </h3>
                 <p className="text-sm text-zinc-300 mb-6">
-                  Bu buton, yapay zekanın ürettiği "AEO JSON-LD" verisini doğrudan Shopify mağazanızın "theme.liquid" dosyasına enjekte eder.
+                  This button directly injects the AI-generated "AEO JSON-LD" payload into your Shopify store theme using App Blocks.
                 </p>
                 <button 
                   onClick={async () => {
                     const finalShop = activeShop || (window as any).shopify?.config?.shop;
                     if (!finalShop) {
-                       alert("Hata: Mağaza bağlantısı doğrulanamadı. Lütfen sayfayı yenileyin.");
+                       alert("Error: Store connection could not be verified. Please refresh the page.");
                        return;
                     }
-                    alert("Shopify Theme API'sine JSON-LD enjeksiyonu başlatılıyor...");
+                    alert("Initiating JSON-LD injection into Shopify Theme API...");
                     try {
                       const res = await fetch("/api/heal", {
                         method: "POST",
@@ -253,17 +253,17 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                       }
 
                       if(data.success) {
-                        alert("Başarılı! " + data.message);
+                        alert("Success! " + data.message);
                       } else {
-                        alert("Hata: " + data.error);
+                        alert("Error: " + data.error);
                       }
                     } catch (err) {
-                      alert("Bağlantı hatası yaşandı.");
+                      alert("Connection error occurred.");
                     }
                   }}
                   className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 px-8 py-3 rounded-xl font-medium transition-all w-full md:w-auto text-lg"
                 >
-                  Otomatik Düzelt & Enjekte Et
+                  Fix Automatically & Inject
                 </button>
               </div>
 

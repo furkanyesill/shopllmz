@@ -11,9 +11,9 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-blue-500/20 mb-6">
             <span className="text-2xl font-bold text-white">S</span>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Mağaza Girişi</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Store Login</h1>
           <p className="text-zinc-400 text-sm">
-            Shopify aboneliği satın almış veya test eden mağazalar için giriş paneli.
+            Login panel for stores testing or subscribing to the app via Shopify.
           </p>
         </div>
 
@@ -29,18 +29,18 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <p className="text-xs text-zinc-500 mt-2">Örn: starducks.myshopify.com</p>
+            <p className="text-xs text-zinc-500 mt-2">e.g. starducks.myshopify.com</p>
           </div>
           <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-4 rounded-xl transition-colors shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2">
-            Devam Et &rarr;
+            Continue &rarr;
           </button>
         </form>
 
         <div className="mt-8 pt-6 border-t border-zinc-800 text-center">
           <p className="text-sm text-zinc-500">
-            Hesabınız yok mu?{' '}
+            Don't have an account?{' '}
             <Link href="/" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
-              Uygulamayı İncele
+              View App Details
             </Link>
           </p>
         </div>
