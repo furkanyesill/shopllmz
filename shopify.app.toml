@@ -1,6 +1,6 @@
 name = "ShopLLMZ"
 client_id = "98ecd3968dbbddd9b0a80eae8c630dee"
-application_url = "https://shopllmz.com"
+application_url = "https://www.shopllmz.com"
 embedded = true
 
 [build]
@@ -12,8 +12,8 @@ scopes = "read_products,write_themes,read_themes"
 
 [auth]
 redirect_urls = [
-  "https://shopllmz.com/api/auth/callback",
-  "https://shopllmz.com/api/auth"
+  "https://www.shopllmz.com/api/auth/callback",
+  "https://www.shopllmz.com/api/auth"
 ]
 
 [webhooks]
@@ -25,8 +25,8 @@ api_version = "2026-01"
 
 
   [webhooks.privacy_compliance]
-  customer_deletion_url = "https://shopllmz.com/api/webhooks/customers/redact"
-  customer_data_request_url = "https://shopllmz.com/api/webhooks/customers/data_request"
-  shop_deletion_url = "https://shopllmz.com/api/webhooks/shop/redact"
+  customer_deletion_url = "https://www.shopllmz.com/api/webhooks/customers/redact"
+  customer_data_request_url = "https://www.shopllmz.com/api/webhooks/customers/data_request"
+  shop_deletion_url = "https://www.shopllmz.com/api/webhooks/shop/redact"
 [pos]
 embedded = false
