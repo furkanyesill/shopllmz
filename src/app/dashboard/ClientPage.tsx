@@ -192,7 +192,7 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
               <div className="p-6 rounded-2xl bg-zinc-900/80 border border-zinc-800 backdrop-blur-sm shadow-xl hover:border-blue-500/30 transition-colors">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                    <span className="text-xl">🤖</span> llms.txt İçeriği
+                    <span className="text-xl">🤖</span> llms.txt Payload
                   </h2>
                   <button onClick={() => navigator.clipboard.writeText(results.llmsTxt)} className="text-sm bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-lg text-zinc-300 transition-colors">
                     {t.common.copy}
