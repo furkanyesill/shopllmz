@@ -133,19 +133,9 @@ export async function GET(req: NextRequest) {
 
     console.log(`✅ OAuth Success — Shop: ${shop}, Session ID: ${sessionId}`);
 
-    // 5. Redirect back into Shopify Admin embedded app
-    // Use the `host` param (base64 encoded admin URL) passed by Shopify for correct routing
-    const host = url.searchParams.get('host');
-    let redirectUrl: string;
-    if (host) {
-      // host is base64url encoded, e.g. "admin.shopify.com/store/shopllmz"
-      const decodedHost = Buffer.from(host, 'base64').toString('utf-8');
-      redirectUrl = `https://${decodedHost}/apps/shopllmz-1`;
-    } else {
-      // Fallback: try the application_url with shop param
-      const hostName = process.env.HOST_NAME || 'https://www.shopllmz.com';
-      redirectUrl = `${hostName}?shop=${shop}`;
-    }
+    // 5. Redirect to the dashboard with the shop param
+    const hostName = process.env.HOST_NAME || 'https://www.shopllmz.com';
+    const redirectUrl = `${hostName}/dashboard?shop=${encodeURIComponent(shop)}`;
     const response = NextResponse.redirect(redirectUrl);
 
     response.cookies.set('shopify_app_session', session.id, {
