@@ -1,6 +1,0 @@
-api_version = "2025-01"
-
-[[extensions]]
-type = "theme_app_extension"
-name = "ShopLLMZ AEO Block"
-handle = "shopllmz-json-ld"
