@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
+import { createHmac } from 'crypto';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Creates a self-contained, signed state token.
+ * Format: base64(shop + ":" + timestamp) + "." + hmac_signature
+ * No cookies, no DB — the signature IS the verification.
+ */
+function createSignedState(shop: string, secret: string): string {
+  const payload = Buffer.from(`${shop}:${Date.now()}`).toString('base64url');
+  const sig = createHmac('sha256', secret).update(payload).digest('hex');
+  return `${payload}.${sig}`;
+}
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -10,60 +22,53 @@ export async function GET(req: Request) {
     return new NextResponse('Missing shop parameter.', { status: 400 });
   }
 
-  // Basic shop format validation (must end in .myshopify.com or be a valid domain)
   const cleanShop = shop.trim().toLowerCase().replace(/^https?:\/\//, '');
 
   const apiKey = process.env.SHOPIFY_API_KEY || '';
+  const secret = process.env.SHOPIFY_API_SECRET || '';
   const scopes = process.env.SHOPIFY_SCOPES || 'read_products,write_themes,read_themes';
   const hostName = process.env.HOST_NAME || 'https://www.shopllmz.com';
   const redirectUri = `${hostName}/api/auth/callback`;
 
-  // Generate a random nonce
-  const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  if (!secret) {
+    return new NextResponse('Server configuration error.', { status: 500 });
+  }
+
+  // Signed state — no cookies, no DB needed (CSRF-safe via HMAC signature)
+  const state = createSignedState(cleanShop, secret);
 
   const authUrl =
     `https://${cleanShop}/admin/oauth/authorize` +
     `?client_id=${apiKey}` +
     `&scope=${encodeURIComponent(scopes)}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-    `&state=${state}`;
+    `&state=${encodeURIComponent(state)}`;
 
-  // We MUST break out of the iframe because Shopify's /admin/oauth/authorize sets X-Frame-Options: DENY.
-  // Instead of an HTTP redirect, we return an HTML page that redirects the parent frame.
+  // Break out of iframe (Shopify's oauth page blocks iframes)
   const html = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Shopify Redirect</title>
+    <title>ShopLLMZ - Authenticating...</title>
     <script>
-      if (window.top !== window.self) {
-        window.top.location.href = "${authUrl}";
-      } else {
-        window.location.href = "${authUrl}";
+      try {
+        if (window.top !== window.self) {
+          window.top.location.href = ${JSON.stringify(authUrl)};
+        } else {
+          window.location.href = ${JSON.stringify(authUrl)};
+        }
+      } catch(e) {
+        window.location.href = ${JSON.stringify(authUrl)};
       }
     </script>
   </head>
-  <body>
+  <body style="background:#000;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
     <p>Redirecting to Shopify for authorization...</p>
-    <p>If you are not redirected, <a href="${authUrl}" target="_top">click here</a>.</p>
   </body>
 </html>`;
 
-  const response = new NextResponse(html, {
+  return new NextResponse(html, {
     status: 200,
-    headers: {
-      'Content-Type': 'text/html',
-    },
+    headers: { 'Content-Type': 'text/html' },
   });
-
-  // Store state in cookie for verification at callback
-  response.cookies.set('shopify_oauth_state', state, {
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-    maxAge: 600,
-    path: '/',
-  });
-
-  return response;
 }

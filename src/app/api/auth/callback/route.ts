@@ -1,13 +1,11 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { sessionStorage, shopify } from '@/lib/shopify';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Verifies the OAuth callback HMAC signature from Shopify.
- * Required by: https://shopify.dev/docs/apps/launch/shopify-app-store/best-practices#a-authentication
  */
 function verifyOAuthHmac(queryParams: URLSearchParams, secret: string): boolean {
   const receivedHmac = queryParams.get('hmac');
@@ -33,6 +31,43 @@ function verifyOAuthHmac(queryParams: URLSearchParams, secret: string): boolean 
   }
 }
 
+/**
+ * Verifies that the state was signed by us (CSRF protection without cookies/DB).
+ * State format: base64url(shop:timestamp).hmac_hex
+ */
+function verifySignedState(state: string, secret: string): { valid: boolean; shop?: string } {
+  try {
+    const dotIdx = state.lastIndexOf('.');
+    if (dotIdx === -1) return { valid: false };
+
+    const payload = state.substring(0, dotIdx);
+    const receivedSig = state.substring(dotIdx + 1);
+
+    const expectedSig = createHmac('sha256', secret).update(payload).digest('hex');
+
+    const a = Buffer.from(expectedSig, 'utf-8');
+    const b = Buffer.from(receivedSig, 'utf-8');
+    if (a.length !== b.length) return { valid: false };
+
+    const sigValid = (() => { try { return timingSafeEqual(a, b); } catch { return false; } })();
+    if (!sigValid) return { valid: false };
+
+    // Decode and validate payload
+    const decoded = Buffer.from(payload, 'base64url').toString('utf-8');
+    const [shop, tsStr] = decoded.split(':');
+    if (!shop || !tsStr) return { valid: false };
+
+    // State must not be older than 10 minutes
+    const ts = parseInt(tsStr, 10);
+    const age = Date.now() - ts;
+    if (age > 10 * 60 * 1000) return { valid: false };
+
+    return { valid: true, shop };
+  } catch {
+    return { valid: false };
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
@@ -44,27 +79,27 @@ export async function GET(req: NextRequest) {
       return new NextResponse('Missing required OAuth callback parameters.', { status: 400 });
     }
 
+    const cleanShop = shop.trim().toLowerCase().replace(/^https?:\/\//, '');
+
     const secret = process.env.SHOPIFY_API_SECRET;
     if (!secret) {
       return new NextResponse('Server configuration error.', { status: 500 });
     }
 
-    // 1. Verify the HMAC signature on the OAuth callback
+    // 1. Verify Shopify HMAC signature
     if (!verifyOAuthHmac(url.searchParams, secret)) {
       return new NextResponse('Unauthorized: invalid HMAC.', { status: 401 });
     }
 
-    // 2. Verify the state nonce matches what we set in the cookie
-    const cookieStore = await cookies();
-    const storedState = cookieStore.get('shopify_oauth_state')?.value;
-    if (!storedState || !state) {
-      return new NextResponse('Unauthorized: missing state.', { status: 401 });
+    // 2. Verify signed state (no cookies or DB required!)
+    if (!state) {
+      return new NextResponse('Unauthorized: missing state parameter.', { status: 401 });
     }
-    const aBuf = Buffer.from(storedState, 'utf-8');
-    const bBuf = Buffer.from(state, 'utf-8');
-    const stateValid = aBuf.length === bBuf.length && (() => { try { return timingSafeEqual(aBuf, bBuf); } catch { return false; } })();
-    if (!stateValid) {
-      return new NextResponse('Unauthorized: state mismatch.', { status: 401 });
+
+    const stateResult = verifySignedState(state, secret);
+    if (!stateResult.valid) {
+      console.error(`Invalid state for shop: ${cleanShop}`);
+      return new NextResponse('Unauthorized: invalid state.', { status: 401 });
     }
 
     // 3. Exchange the authorization code for a permanent access token
@@ -84,10 +119,10 @@ export async function GET(req: NextRequest) {
       return new NextResponse(`Token exchange failed: ${errText}`, { status: 400 });
     }
 
-    const tokenData = await accessTokenResponse.json() as { access_token: string };
+    const tokenData = (await accessTokenResponse.json()) as { access_token: string };
     const { access_token } = tokenData;
 
-    // 4. Build Shopify SDK Session and persist to Neon Postgres
+    // 4. Build Shopify SDK Session and persist to database
     const sessionId = shopify.session.getOfflineId(shop);
     const session = shopify.session.customAppSession(shop);
     session.accessToken = access_token;
@@ -98,7 +133,7 @@ export async function GET(req: NextRequest) {
 
     console.log(`✅ OAuth Success — Shop: ${shop}, Session ID: ${sessionId}`);
 
-    // 5. Redirect into Shopify Admin embedded app
+    // 5. Redirect back into Shopify Admin embedded app
     const redirectUrl = `https://${shop}/admin/apps/shopllmz`;
     const response = NextResponse.redirect(redirectUrl);
 
@@ -109,9 +144,6 @@ export async function GET(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
-
-    // Clear the state nonce cookie
-    response.cookies.delete('shopify_oauth_state');
 
     return response;
   } catch (e) {

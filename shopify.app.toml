@@ -13,7 +13,9 @@ scopes = "read_products,write_themes,read_themes"
 [auth]
 redirect_urls = [
   "https://www.shopllmz.com/api/auth/callback",
-  "https://www.shopllmz.com/api/auth"
+  "https://www.shopllmz.com/api/auth",
+  "https://shopllmz.com/api/auth/callback",
+  "https://shopllmz.com/api/auth"
 ]
 
 [webhooks]
