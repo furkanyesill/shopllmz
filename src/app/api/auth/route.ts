@@ -59,7 +59,7 @@ export async function GET(req: Request) {
   // Store state in cookie for verification at callback
   response.cookies.set('shopify_oauth_state', state, {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',
     secure: true,
     maxAge: 600,
     path: '/',
