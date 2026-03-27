@@ -28,7 +28,33 @@ export async function GET(req: Request) {
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&state=${state}`;
 
-  const response = NextResponse.redirect(authUrl);
+  // We MUST break out of the iframe because Shopify's /admin/oauth/authorize sets X-Frame-Options: DENY.
+  // Instead of an HTTP redirect, we return an HTML page that redirects the parent frame.
+  const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Shopify Redirect</title>
+    <script>
+      if (window.top !== window.self) {
+        window.top.location.href = "${authUrl}";
+      } else {
+        window.location.href = "${authUrl}";
+      }
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to Shopify for authorization...</p>
+    <p>If you are not redirected, <a href="${authUrl}" target="_top">click here</a>.</p>
+  </body>
+</html>`;
+
+  const response = new NextResponse(html, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  });
 
   // Store state in cookie for verification at callback
   response.cookies.set('shopify_oauth_state', state, {
