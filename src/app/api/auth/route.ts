@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
   const apiKey = process.env.SHOPIFY_API_KEY || '';
   const scopes = process.env.SHOPIFY_SCOPES || 'read_products,write_themes,read_themes';
-  const hostName = process.env.HOST_NAME || 'https://shopllmz.com';
+  const hostName = process.env.HOST_NAME || 'https://www.shopllmz.com';
   const redirectUri = `${hostName}/api/auth/callback`;
 
   // Generate a random nonce
