@@ -1,15 +1,25 @@
 {% comment %}
   ShopLLMZ AEO Deep Injector
-  Zero-Footprint Theme App Extension.
-  This block requests dynamically generated AI Schema payloads from your active plan.
+  Theme App Extension Block — Zero-Footprint AI Schema Injector.
+  Adds dynamically generated JSON-LD schema payloads for LLM/AEO optimization.
+  Merchants can add this block from Online Store > Customize > Add block.
 {% endcomment %}
 
-<script src="https://shopllmz.com/api/inject?shop={{ shop.domain }}" async></script>
+<script
+  src="https://shopllmz.com/api/inject?shop={{ shop.domain }}"
+  type="application/json"
+  async
+></script>
 
 {% schema %}
 {
-  "name": "ShopLLMZ AEO Injector",
+  "name": "ShopLLMZ AEO Block",
   "target": "head",
-  "settings": []
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "ShopLLMZ, mağazanızın JSON-LD şemasını yapay zeka arama motorları (ChatGPT, Perplexity) için otomatik olarak optimize eder. Eklentinizi etkinleştirmek için ShopLLMZ kontrol panelinizden Pro planınızı aktive edin."
+    }
+  ]
 }
 {% endschema %}

@@ -1,9 +1,6 @@
-api_version = "2024-10"
+api_version = "2025-01"
 
 [[extensions]]
-type = "ui_extension"
-name = "ShopLLMZ JSON-LD Block"
+type = "theme_app_extension"
+name = "ShopLLMZ AEO Block"
 handle = "shopllmz-json-ld"
-
-  [extensions.targeting]
-  module = "./blocks/json_ld.liquid"

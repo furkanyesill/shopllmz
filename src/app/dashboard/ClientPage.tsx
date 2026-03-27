@@ -4,6 +4,24 @@
 import { useState, useEffect } from "react";
 import { getDictionary, Locale } from "@/dictionaries";
 
+/**
+ * Get a Shopify session token from App Bridge (embedded app context).
+ * Falls back gracefully if not in embedded context.
+ */
+async function getShopifySessionToken(): Promise<string | null> {
+  try {
+    // App Bridge v4+ exposes window.shopify.idToken() in embedded context
+    const shopify = (window as any).shopify;
+    if (shopify?.idToken) {
+      const token = await shopify.idToken();
+      return token || null;
+    }
+  } catch (e) {
+    console.warn('[SessionToken] Could not get session token from App Bridge:', e);
+  }
+  return null;
+}
+
 export default function ClientPage({ initialShop, initialIsPro }: { initialShop: string | null, initialIsPro: boolean }) {
   const [activeShop, setActiveShop] = useState<string | null>(initialShop);
   const [url, setUrl] = useState("");
@@ -39,9 +57,13 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
     setStatus("scanning");
     
     try {
+      const sessionToken = await getShopifySessionToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (sessionToken) headers["Authorization"] = `Bearer ${sessionToken}`;
+
       const res = await fetch("/api/scan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ url }),
       });
       const data = await res.json();
@@ -244,9 +266,13 @@ export default function ClientPage({ initialShop, initialIsPro }: { initialShop:
                     }
                     alert("Initiating JSON-LD injection into Shopify Theme API...");
                     try {
+                      const sessionToken = await getShopifySessionToken();
+                      const healHeaders: Record<string, string> = { "Content-Type": "application/json" };
+                      if (sessionToken) healHeaders["Authorization"] = `Bearer ${sessionToken}`;
+
                       const res = await fetch("/api/heal", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: healHeaders,
                         body: JSON.stringify({ shop: finalShop, url, jsonLd: results.jsonLd })
                       });
                       const data = await res.json();
