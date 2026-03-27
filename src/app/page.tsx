@@ -1,22 +1,8 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { cookies } from "next/headers";
 import { getDictionary, Locale } from "@/dictionaries";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const params = await searchParams;
-  const shop = typeof params.shop === 'string' ? params.shop : null;
-
-  // If Shopify Admin opens the app with ?shop=..., auto-start OAuth immediately.
-  // No need for the user to click "Store Login" manually.
-  if (shop) {
-    redirect(`/api/auth?shop=${encodeURIComponent(shop)}`);
-  }
-
+export default async function Home() {
   const cookieStore = await cookies();
   const lang = (cookieStore.get("lang")?.value as Locale) || "en";
   const t = getDictionary(lang);
@@ -64,17 +50,23 @@ export default async function Home({
       {/* Features Grid */}
       <div id="features" className="z-10 mt-32 max-w-6xl w-full grid grid-cols-1 md:grid-cols-3 gap-6 text-left px-6">
         <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-blue-500/30 transition-colors">
-          <div className="h-12 w-12 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4 text-xl">🤖</div>
+          <div className="h-12 w-12 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4 text-xl">
+            🤖
+          </div>
           <h3 className="text-xl font-bold mb-2">{t.home.feat1Title}</h3>
           <p className="text-zinc-400 text-sm">{t.home.feat1Desc}</p>
         </div>
         <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-emerald-500/30 transition-colors">
-          <div className="h-12 w-12 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 text-xl">⚡</div>
+          <div className="h-12 w-12 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 text-xl">
+            ⚡
+          </div>
           <h3 className="text-xl font-bold mb-2">{t.home.feat2Title}</h3>
           <p className="text-zinc-400 text-sm">{t.home.feat2Desc}</p>
         </div>
         <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-purple-500/30 transition-colors">
-          <div className="h-12 w-12 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4 text-xl">🔎</div>
+          <div className="h-12 w-12 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4 text-xl">
+            🔎
+          </div>
           <h3 className="text-xl font-bold mb-2">{t.home.feat3Title}</h3>
           <p className="text-zinc-400 text-sm">{t.home.feat3Desc}</p>
         </div>
@@ -109,6 +101,7 @@ export default async function Home({
               <li className="flex items-center gap-3">✓ {t.home.proF3}</li>
               <li className="flex items-center gap-3">✓ {t.home.proF4}</li>
             </ul>
+            {/* Replaced Paddle Link with /login for Shopify OAuth */}
             <Link href="/login" className="block w-full text-center py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors shadow-lg shadow-blue-500/25">
               {t.common.upgrade}
             </Link>
